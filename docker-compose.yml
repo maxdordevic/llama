@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Main API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: manus_ai_api
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    env_file:
+      - manus_ai/.env
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./manus_ai:/app/manus_ai
+      - api_data:/app/data
+    restart: unless-stopped
+    networks:
+      - manus_network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: manus_ai_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    environment:
+      - MONGO_INITDB_DATABASE=manus_ai
+    restart: unless-stopped
+    networks:
+      - manus_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: manus_ai_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - manus_network
+    command: redis-server --appendonly yes
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: manus_ai_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - manus_network
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+  api_data:
+
+networks:
+  manus_network:
+    driver: bridge
