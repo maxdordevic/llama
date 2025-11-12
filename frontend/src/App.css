@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+/* App Container */
+.app {
+  @apply min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900;
+}
+
+.app-header {
+  @apply bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm;
+  @apply px-6 py-4;
+}
+
+.app-header h1 {
+  @apply text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+}
+
+.app-header p {
+  @apply text-sm text-gray-600 dark:text-gray-400;
+}
+
+.app-container {
+  @apply max-w-7xl mx-auto p-4;
+}
+
+/* Chat Interface */
+.chat-interface {
+  @apply flex flex-col h-[calc(100vh-120px)] bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden;
+}
+
+.chat-container {
+  @apply flex flex-col h-full;
+}
+
+.chat-input-container {
+  @apply flex gap-3 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50;
+}
+
+.chat-input-container textarea {
+  @apply flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-600;
+  @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
+  @apply px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply placeholder-gray-400 dark:placeholder-gray-500;
+  @apply transition-all duration-200;
+}
+
+.chat-input-container textarea:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.send-button {
+  @apply px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500;
+  @apply text-white font-semibold shadow-lg hover:shadow-xl;
+  @apply transform hover:scale-105 active:scale-95;
+  @apply transition-all duration-200;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+  @apply flex items-center justify-center gap-2;
+}
+
+.chat-info {
+  @apply flex items-center justify-between px-4 pb-2 text-xs text-gray-500 dark:text-gray-400;
+}
+
+.connection-status {
+  @apply flex items-center gap-1;
+}
+
+.connection-status.connected {
+  @apply text-green-600 dark:text-green-400;
+}
+
+.connection-status.disconnected {
+  @apply text-red-600 dark:text-red-400;
+}
+
+/* Prose Styling for Messages */
+.prose {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.prose p {
+  @apply my-2;
+}
+
+.prose code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+  @apply my-3;
+}
+
+.prose ul, .prose ol {
+  @apply my-2 ml-4;
+}
+
+.prose li {
+  @apply my-1;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  @apply font-bold mt-4 mb-2;
+}
+
+.prose h1 {
+  @apply text-2xl;
+}
+
+.prose h2 {
+  @apply text-xl;
+}
+
+.prose h3 {
+  @apply text-lg;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Loading Spinner */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent;
+}
+
+/* Button Variants */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500;
+  @apply text-white font-medium shadow-md hover:shadow-lg;
+  @apply transform hover:scale-105 active:scale-95;
+  @apply transition-all duration-200;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600;
+  @apply bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300;
+  @apply hover:bg-gray-50 dark:hover:bg-gray-700;
+  @apply transition-all duration-200;
+}
+
+/* Card */
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700;
+  @apply shadow-lg p-6;
+}
+
+/* Badge */
+.badge {
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.badge-success {
+  @apply bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400;
+}
+
+.badge-error {
+  @apply bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400;
+}
+
+.badge-info {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400;
+}
