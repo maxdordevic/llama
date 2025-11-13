@@ -52,6 +52,20 @@ pyyaml==6.0.1
 python-dateutil==2.8.2
 pytz==2024.1
 
+# Vector Database & Embeddings (NEW)
+qdrant-client==1.7.3
+sentence-transformers==2.2.2
+
+# Authentication & Security (NEW)
+PyJWT==2.8.0
+bcrypt==4.1.2
+
+# Monitoring & Analytics (NEW)
+prometheus-client==0.19.0
+
+# Image Generation (NEW - Optional)
+# replicate==0.20.0  # Uncomment for Stable Diffusion support
+
 # Logging & Monitoring
 structlog==24.1.0
 
