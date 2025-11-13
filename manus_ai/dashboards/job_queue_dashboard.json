@@ -1,0 +1,214 @@
+{
+  "dashboard": {
+    "title": "Manus AI - Job Queue Monitoring",
+    "tags": ["manus-ai", "celery", "jobs"],
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "version": 1,
+    "refresh": "5s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Workers",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "celery_workers_active",
+            "legendFormat": "Workers",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value",
+          "textMode": "value_and_name"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 1, "color": "yellow"},
+                {"value": 2, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(celery_tasks_active)",
+            "legendFormat": "Tasks",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Task Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(celery_tasks_total{state='success'}[5m]) / rate(celery_tasks_total[5m]) * 100",
+            "legendFormat": "Success Rate",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 90, "color": "yellow"},
+                {"value": 95, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Queue Length",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "celery_queue_length",
+            "legendFormat": "Pending",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 100, "color": "yellow"},
+                {"value": 500, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Task Execution Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(celery_tasks_total{state='success'}[5m])",
+            "legendFormat": "Success",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(celery_tasks_total{state='failure'}[5m])",
+            "legendFormat": "Failure",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "yaxes": [
+          {"format": "short", "label": "Tasks/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Task Execution Time (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(celery_task_execution_time_seconds_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(celery_task_execution_time_seconds_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "yaxes": [
+          {"format": "s", "label": "Duration"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Tasks by Type",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by(task_name) (celery_tasks_total)",
+            "legendFormat": "{{task_name}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 12}
+      },
+      {
+        "id": 8,
+        "title": "Worker Utilization",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "celery_worker_tasks_active / celery_worker_pool_size * 100",
+            "legendFormat": "{{worker}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 12},
+        "yaxes": [
+          {"format": "percent", "label": "Utilization", "min": 0, "max": 100},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Task Failures by Type",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, sum by(task_name) (celery_tasks_total{state='failure'}))",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 12}
+      }
+    ]
+  }
+}

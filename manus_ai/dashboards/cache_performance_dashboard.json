@@ -1,0 +1,293 @@
+{
+  "dashboard": {
+    "title": "Manus AI - Cache Performance",
+    "tags": ["manus-ai", "cache", "redis"],
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "version": 1,
+    "refresh": "10s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Cache Hit Rate",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "rate(cache_hits_total[5m]) / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m])) * 100",
+            "legendFormat": "Hit Rate",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 50, "color": "yellow"},
+                {"value": 80, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total Cache Keys",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "cache_keys_total",
+            "legendFormat": "Keys",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 0},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Cache Memory Usage",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "cache_memory_bytes / 1024 / 1024",
+            "legendFormat": "Memory",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 0},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "decmbytes",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 800, "color": "yellow"},
+                {"value": 950, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Estimated Cost Savings",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "cache_llm_cost_saved_total",
+            "legendFormat": "Saved",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 4},
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value",
+          "textMode": "value_and_name"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 2,
+            "color": {"mode": "fixed", "fixedColor": "green"}
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Cache Operations Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(cache_hits_total[5m])",
+            "legendFormat": "Hits",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(cache_misses_total[5m])",
+            "legendFormat": "Misses",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(cache_sets_total[5m])",
+            "legendFormat": "Sets",
+            "refId": "C"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "yaxes": [
+          {"format": "ops", "label": "Operations/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Cache Hit Rate by Namespace",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(cache_hits_total[5m]) / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m])) * 100",
+            "legendFormat": "{{namespace}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "yaxes": [
+          {"format": "percent", "label": "Hit Rate", "min": 0, "max": 100},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Cache Size by Namespace",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by(namespace) (cache_keys_total)",
+            "legendFormat": "{{namespace}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "LLM Response Cache Performance",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(cache_hits_total{namespace='llm_responses'}[5m]) / (rate(cache_hits_total{namespace='llm_responses'}[5m]) + rate(cache_misses_total{namespace='llm_responses'}[5m])) * 100",
+            "legendFormat": "LLM Hit Rate",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 16},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 1
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Embedding Cache Performance",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(cache_hits_total{namespace='embeddings'}[5m]) / (rate(cache_hits_total{namespace='embeddings'}[5m]) + rate(cache_misses_total{namespace='embeddings'}[5m])) * 100",
+            "legendFormat": "Embedding Hit Rate",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 16},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 1
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "Cache Evictions",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(cache_evictions_total[5m])",
+            "legendFormat": "Evictions",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 6, "w": 12, "x": 8, "y": 20},
+        "yaxes": [
+          {"format": "short", "label": "Evictions/sec"},
+          {"format": "short"}
+        ],
+        "alert": {
+          "name": "High Cache Eviction Rate",
+          "conditions": [
+            {
+              "evaluator": {"params": [10], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "message": "Cache eviction rate is high. Consider increasing cache size.",
+          "noDataState": "no_data"
+        }
+      },
+      {
+        "id": 11,
+        "title": "Top Cached Items by Access Frequency",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(20, cache_item_hits_total)",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 12,
+        "title": "Cache Latency (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(cache_operation_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(cache_operation_duration_seconds_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "yaxes": [
+          {"format": "ms", "label": "Latency"},
+          {"format": "short"}
+        ]
+      }
+    ]
+  }
+}

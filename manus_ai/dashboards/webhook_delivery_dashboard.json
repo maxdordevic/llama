@@ -1,0 +1,275 @@
+{
+  "dashboard": {
+    "title": "Manus AI - Webhook Deliveries",
+    "tags": ["manus-ai", "webhooks", "events"],
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "version": 1,
+    "refresh": "30s",
+    "time": {
+      "from": "now-3h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Webhook Success Rate",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "rate(webhook_deliveries_total{status='sent'}[5m]) / rate(webhook_deliveries_total[5m]) * 100",
+            "legendFormat": "Success Rate",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 95, "color": "yellow"},
+                {"value": 99, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Webhooks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "webhooks_registered_total{active='true'}",
+            "legendFormat": "Active",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 0},
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Events Emitted",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(events_emitted_total[1h]))",
+            "legendFormat": "Events",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 0},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Failed Deliveries (Last Hour)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(webhook_deliveries_total{status='failed'}[1h]))",
+            "legendFormat": "Failed",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 4},
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 10, "color": "yellow"},
+                {"value": 50, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Retry Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(webhook_deliveries_total{status='retry'}[5m]))",
+            "legendFormat": "Retries",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 4},
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 6,
+        "title": "Webhook Delivery Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(webhook_deliveries_total{status='sent'}[5m])",
+            "legendFormat": "Successful",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(webhook_deliveries_total{status='failed'}[5m])",
+            "legendFormat": "Failed",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(webhook_deliveries_total{status='retry'}[5m])",
+            "legendFormat": "Retries",
+            "refId": "C"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "yaxes": [
+          {"format": "short", "label": "Deliveries/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Webhook Latency (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(webhook_delivery_latency_seconds_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(webhook_delivery_latency_seconds_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "yaxes": [
+          {"format": "s", "label": "Latency"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Events by Type",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by(event_type) (events_emitted_total)",
+            "legendFormat": "{{event_type}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16}
+      },
+      {
+        "id": 9,
+        "title": "Deliveries by Webhook",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum by(webhook_id) (webhook_deliveries_total)",
+            "legendFormat": "{{webhook_id}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
+        "options": {
+          "orientation": "horizontal",
+          "displayMode": "gradient"
+        }
+      },
+      {
+        "id": 10,
+        "title": "Failed Webhooks",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, sum by(webhook_id, url) (webhook_deliveries_total{status='failed'}))",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16}
+      },
+      {
+        "id": 11,
+        "title": "Event Emission Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(events_emitted_total[5m])",
+            "legendFormat": "{{event_type}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "yaxes": [
+          {"format": "short", "label": "Events/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Webhook Retry Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "sum by(attempts) (webhook_delivery_attempts)",
+            "legendFormat": "{{attempts}} attempts",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 13,
+        "title": "Recent Event History",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job='manus_ai'} |= 'Event emitted'",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+      }
+    ],
+    "annotations": {
+      "list": [
+        {
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "webhook_deliveries_total{status='failed'}",
+          "name": "Failed Deliveries",
+          "tagKeys": "webhook_id,event_type"
+        }
+      ]
+    }
+  }
+}

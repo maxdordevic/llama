@@ -122,6 +122,77 @@ services:
     networks:
       - manus_network
 
+  # Celery Worker (NEW - Background Job Processing)
+  celery_worker:
+    build:
+      context: ./manus_ai
+      dockerfile: Dockerfile.celery
+    container_name: manus_ai_celery_worker
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_URI=mongodb://mongodb:27017
+      - LOG_LEVEL=INFO
+    env_file:
+      - manus_ai/.env
+    depends_on:
+      - redis
+      - mongodb
+    volumes:
+      - ./manus_ai:/app/manus_ai
+      - celery_data:/app/data
+    restart: unless-stopped
+    networks:
+      - manus_network
+    # Scale workers with: docker-compose up -d --scale celery_worker=4
+
+  # Celery Beat (NEW - Scheduled Task Scheduler)
+  celery_beat:
+    build:
+      context: ./manus_ai
+      dockerfile: Dockerfile.celery-beat
+    container_name: manus_ai_celery_beat
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_URI=mongodb://mongodb:27017
+      - LOG_LEVEL=INFO
+    env_file:
+      - manus_ai/.env
+    depends_on:
+      - redis
+      - mongodb
+      - celery_worker
+    volumes:
+      - ./manus_ai:/app/manus_ai
+      - celery_beat_data:/app/data
+    restart: unless-stopped
+    networks:
+      - manus_network
+
+  # Flower (NEW - Celery Monitoring Dashboard)
+  flower:
+    build:
+      context: ./manus_ai
+      dockerfile: Dockerfile.celery
+    container_name: manus_ai_flower
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - FLOWER_PORT=5555
+      - FLOWER_BASIC_AUTH=admin:manusai2024
+    depends_on:
+      - redis
+      - celery_worker
+    command: ["celery", "-A", "manus_ai.core.jobs:celery_app", "flower", "--port=5555"]
+    restart: unless-stopped
+    networks:
+      - manus_network
+
 volumes:
   mongodb_data:
   mongodb_config:
@@ -130,6 +201,8 @@ volumes:
   qdrant_data:
   prometheus_data:
   grafana_data:
+  celery_data:
+  celery_beat_data:
 
 networks:
   manus_network:
