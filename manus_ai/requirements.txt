@@ -66,6 +66,13 @@ prometheus-client==0.19.0
 # Image Generation (NEW - Optional)
 # replicate==0.20.0  # Uncomment for Stable Diffusion support
 
+# Background Jobs & Task Queue (NEW)
+celery[redis]==5.3.4
+flower==2.0.1  # Celery monitoring
+
+# Advanced Caching (NEW)
+redis[hiredis]==5.0.1  # Already listed above, ensure async support
+
 # Logging & Monitoring
 structlog==24.1.0
 
